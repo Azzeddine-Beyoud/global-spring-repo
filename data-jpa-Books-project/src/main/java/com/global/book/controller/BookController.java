@@ -55,6 +55,7 @@ public class BookController {
 	public ResponseEntity<?> insert(@RequestBody @Valid BookDto dto) {
 		
 		Book book = new Book();
+		book.setId(dto.getId());
 		book.setName(dto.getName());
 		book.setPrice(dto.getPrice());
 		book.setAuther(dto.getAuther());

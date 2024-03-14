@@ -1,4 +1,4 @@
-package com.global.book.entity;
+ package com.global.book.entity;
 
 import java.time.LocalDateTime;
 
@@ -20,13 +20,22 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.NamedStoredProcedureQueries;
+import jakarta.persistence.NamedStoredProcedureQuery;
+import jakarta.persistence.ParameterMode;
 import jakarta.persistence.PostLoad;
+import jakarta.persistence.StoredProcedureParameter;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+
+
+@NamedStoredProcedureQuery(name = "Book.getBookByAuther", procedureName = "GET_TOTAL_CARS_BY_MODEL", parameters = {
+	@StoredProcedureParameter(mode = ParameterMode.IN, name = "auther_id_in", type = String.class),
+	@StoredProcedureParameter(mode = ParameterMode.OUT, name = "book_count", type = Integer.class)})
 
 @Entity
 @Table(name = "books")
@@ -41,17 +50,17 @@ public class Book extends BaseEntity<Long>{
 	@Max(value = 500)
 	private double price;
 	
-	@Transient /* for tell the JPA, we don't need this variable like a column in database, this variable for just calculate*/
+	@Transient  /* for tell the JPA, we don't need this variable like a column in database, this variable for just calculate*/
 	private double discounte;
 	
-//	@Transient
-	@Formula("(select count(*) from books)") /* this is like a subQuery, put them between brackets*/
+
+	@Formula("(select count(*) from books)") /* this is like a subQuery, put them between brackets (write Native query with Formula)*/
 	private long bookCount; 
 	
 	@NotNull
 	@JsonBackReference
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name ="auter_id")
+	@JoinColumn(name ="auther_id")
 	private Auther auther;
 	
 
@@ -85,23 +94,23 @@ public class Book extends BaseEntity<Long>{
 	}
 
 	public double getDiscounte() {
-		return price * .25;
+		return discounte;
 	}
 
 	public void setDiscounte(double discounte) {
 		this.discounte = discounte;
 	}
 	
-	@PostLoad /* for count the discounte before get the entity from database */
+	@PostLoad /* for count the discounte before get the entity from database (this annotation work with @Transient)*/
 	public void calcDiscounte() {
 		
 		this.setDiscounte(price * .25);
 	}
 
-	
 	public long getBookCount() {
 		return bookCount;
 	}
+
 	public void setBookCount(long bookCount) {
 		this.bookCount = bookCount;
 	}

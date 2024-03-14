@@ -46,7 +46,6 @@ public abstract class BaseEntity<ID> {
 		this.id = id;
 	}
 
-	
 	public String getStatusCode() {
 		return statusCode;
 	}
